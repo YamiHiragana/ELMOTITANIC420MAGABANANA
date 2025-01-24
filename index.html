@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solana Wallet Connector with Token Display</title>
+    <title>Solana Wallet Connector with Profile and Tokens</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -13,6 +13,7 @@
             align-items: center;
             padding: 20px;
             margin: 0;
+            min-height: 100vh;
         }
 
         h1 {
@@ -53,8 +54,49 @@
             word-break: break-all;
         }
 
-        #tokens {
+        #profile-section {
             margin-top: 20px;
+            text-align: left;
+        }
+
+        #username-form {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        #username-input {
+            padding: 8px;
+            font-size: 1em;
+            margin-bottom: 10px;
+            width: 100%;
+            max-width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        #save-username-button {
+            padding: 8px 16px;
+            background-color: #38A169;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #save-username-button:hover {
+            background-color: #2F855A;
+        }
+
+        #username-display {
+            margin-top: 10px;
+            font-size: 1em;
+            color: #2D3748;
+        }
+
+        #tokens {
+            margin-top: 30px;
             width: 100%;
             overflow-x: auto;
         }
@@ -110,6 +152,14 @@
             table, th, td {
                 font-size: 0.9em;
             }
+
+            #username-form {
+                width: 100%;
+            }
+
+            #username-input {
+                max-width: 100%;
+            }
         }
 
         /* Token Logo Styling */
@@ -130,6 +180,16 @@
     <div id="wallet-info" style="display: none;">
         <div class="info-item"><strong>Public Key:</strong> <span id="public-key"></span></div>
         <div class="info-item"><strong>SOL Balance:</strong> <span id="sol-balance"></span> SOL</div>
+
+        <div id="profile-section">
+            <h2>Profile</h2>
+            <div id="username-form">
+                <label for="username-input"><strong>Username:</strong></label>
+                <input type="text" id="username-input" placeholder="Enter your username">
+                <button id="save-username-button">Save Username</button>
+            </div>
+            <div id="username-display"></div>
+        </div>
 
         <div id="tokens">
             <h2>Your Tokens</h2>
@@ -171,7 +231,14 @@
         const errorMessage = document.getElementById('error-message');
         const tokenTableBody = document.getElementById('token-table-body');
 
-        // Function to load the token list from Solana Token Registry
+        const usernameInput = document.getElementById('username-input');
+        const saveUsernameButton = document.getElementById('save-username-button');
+        const usernameDisplay = document.getElementById('username-display');
+
+        /**
+         * Function to load the token list from Solana Token Registry
+         * Returns a map of token mint addresses to token details
+         */
         const loadTokenList = async () => {
             if (typeof TokenListProvider === 'undefined') {
                 console.error('Failed to load TokenListProvider.');
@@ -192,7 +259,9 @@
             }
         };
 
-        // Function to connect to Phantom Wallet
+        /**
+         * Function to connect to Phantom Wallet
+         */
         const connectWallet = async () => {
             if (!isPhantomInstalled) {
                 errorMessage.innerHTML = 'Phantom Wallet is not installed. Please install it from <a href="https://phantom.app/" target="_blank">here</a>.';
@@ -299,6 +368,9 @@
                 walletInfo.style.display = 'block';
                 errorMessage.textContent = '';
 
+                // Load and display username if exists
+                loadUsername(publicKey);
+
                 // Optionally, disable the connect button after successful connection
                 connectButton.disabled = true;
                 connectButton.textContent = 'Wallet Connected';
@@ -314,14 +386,43 @@
             }
         };
 
+        /**
+         * Function to save username to localStorage
+         */
+        const saveUsername = () => {
+            const username = usernameInput.value.trim();
+            if (username === '') {
+                alert('Username cannot be empty.');
+                return;
+            }
+
+            const publicKey = publicKeySpan.textContent;
+            localStorage.setItem(`username_${publicKey}`, username);
+            usernameDisplay.textContent = `Username: ${username}`;
+            usernameInput.value = '';
+        };
+
+        /**
+         * Function to load username from localStorage
+         */
+        const loadUsername = (publicKey) => {
+            const savedUsername = localStorage.getItem(`username_${publicKey}`);
+            if (savedUsername) {
+                usernameDisplay.textContent = `Username: ${savedUsername}`;
+            }
+        };
+
         // Add event listener to the connect button
         connectButton.addEventListener('click', connectWallet);
+
+        // Add event listener to the save username button
+        saveUsernameButton.addEventListener('click', saveUsername);
 
         // Optional: Listen for account changes (e.g., user switches accounts or networks)
         if (isPhantomInstalled) {
             window.solana.on("accountChanged", (newPublicKey) => {
                 if (newPublicKey) {
-                    // If a new account is connected, reload the page to update the balance
+                    // If a new account is connected, reload the page to update the balance and tokens
                     window.location.reload();
                 } else {
                     // If the wallet is disconnected, reload the page
