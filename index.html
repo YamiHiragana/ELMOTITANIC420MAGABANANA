@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solana Wallet Connector</title>
+    <title>Solana Wallet Connector with Token Display</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -11,10 +11,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
             padding: 20px;
+            margin: 0;
         }
 
         h1 {
@@ -46,13 +44,40 @@
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 500px;
+            max-width: 800px;
         }
 
         .info-item {
             margin: 15px 0;
             font-size: 1.1em;
             word-break: break-all;
+        }
+
+        #tokens {
+            margin-top: 20px;
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #805AD5;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
         }
 
         #error-message {
@@ -81,6 +106,19 @@
                 width: 100%;
                 font-size: 1em;
             }
+
+            table, th, td {
+                font-size: 0.9em;
+            }
+        }
+
+        /* Token Logo Styling */
+        .token-logo {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            vertical-align: middle;
+            margin-right: 10px;
         }
     </style>
 </head>
@@ -92,12 +130,30 @@
     <div id="wallet-info" style="display: none;">
         <div class="info-item"><strong>Public Key:</strong> <span id="public-key"></span></div>
         <div class="info-item"><strong>SOL Balance:</strong> <span id="sol-balance"></span> SOL</div>
+
+        <div id="tokens">
+            <h2>Your Tokens</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Token</th>
+                        <th>Symbol</th>
+                        <th>Balance</th>
+                    </tr>
+                </thead>
+                <tbody id="token-table-body">
+                    <!-- Token rows will be inserted here -->
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <div id="error-message"></div>
 
     <!-- Include Solana Web3.js via CDN -->
     <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.js"></script>
+    <!-- Include Token List (Solana Labs Token List) via CDN -->
+    <script src="https://unpkg.com/@solana/spl-token-registry@latest/dist/token-registry.iife.js"></script>
 
     <script>
         // Ensure the Solana Web3.js library is loaded
@@ -113,6 +169,28 @@
         const publicKeySpan = document.getElementById('public-key');
         const solBalanceSpan = document.getElementById('sol-balance');
         const errorMessage = document.getElementById('error-message');
+        const tokenTableBody = document.getElementById('token-table-body');
+
+        // Function to load the token list from Solana Token Registry
+        const loadTokenList = async () => {
+            if (typeof TokenListProvider === 'undefined') {
+                console.error('Failed to load TokenListProvider.');
+                return {};
+            }
+
+            try {
+                const tokens = await TokenListProvider.TokenListProvider.load();
+                const tokenList = tokens.filter(token => token.chainId === 101); // 101 is the chain ID for Solana
+                const tokenMap = tokenList.reduce((map, token) => {
+                    map[token.address] = token;
+                    return map;
+                }, {});
+                return tokenMap;
+            } catch (err) {
+                console.error('Failed to load token list:', err);
+                return {};
+            }
+        };
 
         // Function to connect to Phantom Wallet
         const connectWallet = async () => {
@@ -148,7 +226,74 @@
                 // Fetch SOL balance
                 const balance = await connection.getBalance(new solanaWeb3.PublicKey(publicKey));
                 const solBalance = balance / solanaWeb3.LAMPORTS_PER_SOL;
-                solBalanceSpan.textContent = solBalance;
+                solBalanceSpan.textContent = solBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 });
+
+                // Load token list
+                const tokenListMap = await loadTokenList();
+
+                // Fetch SPL Token Accounts
+                const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
+                    new solanaWeb3.PublicKey(publicKey),
+                    {
+                        programId: solanaWeb3.TOKEN_PROGRAM_ID,
+                    }
+                );
+
+                // Process and display tokens
+                tokenAccounts.value.forEach(tokenAccount => {
+                    const tokenInfo = tokenAccount.account.data.parsed.info;
+                    const tokenAmount = tokenInfo.tokenAmount.uiAmount;
+                    const tokenDecimals = tokenInfo.tokenAmount.decimals;
+                    const tokenMint = tokenInfo.mint;
+
+                    // Skip tokens with 0 balance
+                    if (tokenAmount === 0) return;
+
+                    // Get token details from the token list
+                    const tokenDetails = tokenListMap[tokenMint];
+                    const tokenSymbol = tokenDetails ? tokenDetails.symbol : 'Unknown Token';
+                    const tokenName = tokenDetails ? tokenDetails.name : 'Unknown Token';
+                    const tokenLogoURI = tokenDetails ? tokenDetails.logoURI : '';
+
+                    // Create table row
+                    const row = document.createElement('tr');
+
+                    // Token Logo and Name
+                    const tokenCell = document.createElement('td');
+                    if (tokenLogoURI) {
+                        const img = document.createElement('img');
+                        img.src = tokenLogoURI;
+                        img.alt = `${tokenSymbol} logo`;
+                        img.className = 'token-logo';
+                        tokenCell.appendChild(img);
+                    } else {
+                        // Placeholder if no logo
+                        const placeholder = document.createElement('div');
+                        placeholder.style.width = '24px';
+                        placeholder.style.height = '24px';
+                        placeholder.style.display = 'inline-block';
+                        placeholder.style.borderRadius = '50%';
+                        placeholder.style.backgroundColor = '#ccc';
+                        placeholder.style.marginRight = '10px';
+                        tokenCell.appendChild(placeholder);
+                    }
+                    const tokenNameText = document.createElement('span');
+                    tokenNameText.textContent = tokenName;
+                    tokenCell.appendChild(tokenNameText);
+                    row.appendChild(tokenCell);
+
+                    // Token Symbol
+                    const symbolCell = document.createElement('td');
+                    symbolCell.textContent = tokenSymbol;
+                    row.appendChild(symbolCell);
+
+                    // Token Balance
+                    const balanceCell = document.createElement('td');
+                    balanceCell.textContent = tokenAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 });
+                    row.appendChild(balanceCell);
+
+                    tokenTableBody.appendChild(row);
+                });
 
                 // Display wallet information
                 walletInfo.style.display = 'block';
