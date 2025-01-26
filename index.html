@@ -164,10 +164,6 @@
       text-decoration: none;
     }
 
- <!-- Bottom Left Image -->
-  <img src="Screenshot_2025-01-26_014139-removebg-preview.png" alt="Descriptive Alt Text" class="bottom-left-image">
-
-
     .footer a:hover {
       text-decoration: underline;
     }
@@ -185,6 +181,19 @@
       box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
       margin: 20px 0;
       z-index: 1;
+    }
+
+    /* Bottom Left Image Styling */
+    .bottom-left-image {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      width: 150px; /* Default width */
+      height: auto;
+      z-index: 2; /* Ensure it's above the background but below other elements if needed */
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+      border: 2px solid #ffffff; /* Optional: Add a border for better visibility */
+      border-radius: 4px; /* Optional: Rounded corners */
     }
 
     /* Responsive Design Adjustments */
@@ -216,6 +225,10 @@
         width: 180px;
         font-size: 17px;
         padding: 18px;
+      }
+
+      .bottom-left-image {
+        width: 130px; /* Adjust image size for medium screens */
       }
     }
 
@@ -252,6 +265,10 @@
       .video-container {
         width: 90%;
       }
+
+      .bottom-left-image {
+        width: 110px; /* Adjust image size for small screens */
+      }
     }
 
     @media (max-width: 480px) {
@@ -287,6 +304,10 @@
 
       .video-container {
         width: 100%;
+      }
+
+      .bottom-left-image {
+        width: 100px; /* Further adjust image size for very small screens */
       }
 
       /* Further adjustments for extremely small screens */
@@ -334,9 +355,12 @@
     BUY BUY BUY
   </div>
 
+  <!-- Bottom Left Image -->
+  <img src="Screenshot_2025-01-26_014139-removebg-preview.png" alt="Descriptive Alt Text" class="bottom-left-image">
+
   <!-- Footer Section -->
   <div class="footer">
-    &copy; 
+    &copy; 2025 @UruaLabs
   </div>
 
   <!-- JavaScript for Menu Toggle -->
