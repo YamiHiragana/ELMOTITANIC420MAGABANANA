@@ -12,11 +12,13 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
       background-color: #008080; /* Teal background commonly seen in old Windows */
       background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAKlBMVEUAAAD///+ZmZnMzMyenp6vr6+ysrL5+fnx8fG2trbCwsLJycny8vLk5OTn5+fR0dHCwsLIyMj4+PjU1NTB0vAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABt0lEQVQoz2XST0rDQBCG4QfAJhQEtYCKWgL9AxmQ+gMViJYUFYXFjY2GxvYBc6a3d3d3Z2biH5h0RnmHPnDlzNw/4dBgsqPLc5KkVqgYIvgU+Af4A5YBjMHwkUFgYkC9F3YEYvcVEdc8Rx+hRZCL3T/iHeFiSNsjIUiH4nXfg+oV1sLZywTwBkg2jPRmB0lT+BNqeyk+FvDwAvl+D7gPtLGKXNzIj2kOYB3bMtkaewRzgrjwIWV9kTsvtvY6gBNvAOl5uI4hfaWurOqJHvjVj7EfQvOrEOWXxLk6VGsAZ9B0gc4Gg0JqQgeF4brAK3V+sJR8V/KPsIQmnV3CLgfExwq8wDFknnVug0McthbkGsLW7nsU7pbvgFvAr1t0wR77W4EBOFGiJOxpbGVnL7Hr8eOyzag8bc7j2a2XLmFcBwHPhBOPKhkHZgrfCztthWYsmU4g2Z1kY8fC6z0TX2AmDapBNIdg8rCDaL2jgV6pxR63xmxPWbdAAAAAElFTkSuQmCC');
       background-repeat: repeat;
       overflow: hidden;
+      position: relative;
+      font-family: 'Tahoma', 'Geneva', sans-serif; /* Consistent font across the site */
     }
 
     /* 3D Title Styling */
@@ -42,6 +44,7 @@
     .video-container {
       position: relative;
       z-index: 1;
+      margin-bottom: 40px; /* Space above the footer */
     }
 
     video {
@@ -60,16 +63,166 @@
       background: rgba(0, 0, 0, 0.5);
       z-index: 0;
     }
+
+    /* Menu Button Styling */
+    .menu-container {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 2;
+    }
+
+    .menu-button {
+      background-color: #c0c0c0; /* Classic Windows button color */
+      border: 2px outset #ffffff;
+      padding: 8px 12px;
+      font-family: 'Tahoma', 'Geneva', sans-serif;
+      font-size: 14px;
+      cursor: pointer;
+      user-select: none;
+      position: relative;
+    }
+
+    .menu-button:active {
+      border: 2px inset #ffffff;
+    }
+
+    /* Dropdown Menu Styling */
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 40px;
+      right: 0;
+      background-color: #c0c0c0;
+      border: 2px outset #ffffff;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+      min-width: 150px;
+      z-index: 3;
+    }
+
+    .dropdown-menu a {
+      display: block;
+      padding: 8px 12px;
+      text-decoration: none;
+      color: #000;
+      font-family: 'Tahoma', 'Geneva', sans-serif;
+      font-size: 14px;
+      border-bottom: 1px solid #fff;
+    }
+
+    .dropdown-menu a:last-child {
+      border-bottom: none;
+    }
+
+    .dropdown-menu a:hover {
+      background-color: #000080; /* Dark blue on hover */
+      color: #fff;
+    }
+
+    /* Show the dropdown menu when active */
+    .menu-container.active .dropdown-menu {
+      display: block;
+    }
+
+    /* Footer Styling */
+    .footer {
+      width: 100%;
+      background-color: #c0c0c0;
+      border-top: 2px outset #ffffff;
+      text-align: center;
+      padding: 10px 0;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      font-size: 14px;
+      color: #000;
+      box-shadow: 0 -2px 5px rgba(0,0,0,0.5);
+      z-index: 2;
+    }
+
+    /* Footer Link Styling (if needed in the future) */
+    .footer a {
+      color: #000;
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* Adjustments for Responsive Design */
+    @media (max-width: 600px) {
+      .title {
+        font-size: 32px;
+      }
+
+      .menu-button {
+        padding: 6px 10px;
+        font-size: 12px;
+      }
+
+      .dropdown-menu {
+        min-width: 120px;
+      }
+
+      .dropdown-menu a {
+        padding: 6px 10px;
+        font-size: 12px;
+      }
+
+      .footer {
+        font-size: 12px;
+        padding: 8px 0;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="overlay"></div>
+
+  <!-- Menu Button -->
+  <div class="menu-container" id="menuContainer">
+    <div class="menu-button" id="menuButton">Menu</div>
+    <div class="dropdown-menu" id="dropdownMenu">
+      <a href="#">CA</a>
+      <a href="#">SOON</a>
+      <a href="#">SOONt</a>
+      <a href="#">SOON</a>
+    </div>
+  </div>
+
+  <!-- 3D Title -->
   <div class="title">ELMOTITANIC420MAGABANANA</div>
+
+  <!-- Video Container -->
   <div class="video-container">
     <video controls autoplay>
       <source src="video_V1.mp4" type="video/mp4">
       Your browser does not support the video tag.
     </video>
   </div>
+
+  <!-- Footer Section -->
+  <div class="footer">
+    &copy; 2025 @UruaLabs
+  </div>
+
+  <!-- JavaScript for Menu Toggle -->
+  <script>
+    const menuButton = document.getElementById('menuButton');
+    const menuContainer = document.getElementById('menuContainer');
+
+    menuButton.addEventListener('click', (e) => {
+      e.stopPropagation(); // Prevent the event from bubbling up to window
+      menuContainer.classList.toggle('active');
+    });
+
+    // Close the menu when clicking outside
+    window.addEventListener('click', (e) => {
+      if (!menuContainer.contains(e.target)) {
+        menuContainer.classList.remove('active');
+      }
+    });
+  </script>
 </body>
 </html>
