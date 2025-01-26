@@ -2,28 +2,74 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Video Website</title>
   <style>
+    /* Old Microsoft-Style Background */
     body {
       margin: 0;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      background-color: #000;
+      background-color: #008080; /* Teal background commonly seen in old Windows */
+      background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAKlBMVEUAAAD///+ZmZnMzMyenp6vr6+ysrL5+fnx8fG2trbCwsLJycny8vLk5OTn5+fR0dHCwsLIyMj4+PjU1NTB0vAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABt0lEQVQoz2XST0rDQBCG4QfAJhQEtYCKWgL9AxmQ+gMViJYUFYXFjY2GxvYBc6a3d3d3Z2biH5h0RnmHPnDlzNw/4dBgsqPLc5KkVqgYIvgU+Af4A5YBjMHwkUFgYkC9F3YEYvcVEdc8Rx+hRZCL3T/iHeFiSNsjIUiH4nXfg+oV1sLZywTwBkg2jPRmB0lT+BNqeyk+FvDwAvl+D7gPtLGKXNzIj2kOYB3bMtkaewRzgrjwIWV9kTsvtvY6gBNvAOl5uI4hfaWurOqJHvjVj7EfQvOrEOWXxLk6VGsAZ9B0gc4Gg0JqQgeF4brAK3V+sJR8V/KPsIQmnV3CLgfExwq8wDFknnVug0McthbkGsLW7nsU7pbvgFvAr1t0wR77W4EBOFGiJOxpbGVnL7Hr8eOyzag8bc7j2a2XLmFcBwHPhBOPKhkHZgrfCztthWYsmU4g2Z1kY8fC6z0TX2AmDapBNIdg8rCDaL2jgV6pxR63xmxPWbdAAAAAElFTkSuQmCC');
+      background-repeat: repeat;
       overflow: hidden;
     }
+
+    /* 3D Title Styling */
+    .title {
+      font-family: 'Arial Black', Gadget, sans-serif;
+      font-size: 48px;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      text-align: center;
+      margin-bottom: 20px;
+      position: relative;
+      /* 3D Effect */
+      text-shadow:
+        1px 1px 0 #000,
+        2px 2px 0 #000,
+        3px 3px 0 #000,
+        4px 4px 0 #000,
+        5px 5px 0 #000;
+    }
+
+    /* Video Container Styling */
+    .video-container {
+      position: relative;
+      z-index: 1;
+    }
+
     video {
       max-width: 100%;
-      max-height: 100%;
+      max-height: 80vh;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Optional: Add a subtle overlay to enhance visibility */
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 0;
     }
   </style>
 </head>
 <body>
-  <video controls autoplay>
-    <source src="video_V1.mp4">
-    Your browser does not support the video tag.
-  </video>
+  <div class="overlay"></div>
+  <div class="title">ELMOTITANIC420MAGABANANA</div>
+  <div class="video-container">
+    <video controls autoplay>
+      <source src="video_V1.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+  </div>
 </body>
 </html>
